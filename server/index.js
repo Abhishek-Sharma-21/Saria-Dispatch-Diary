@@ -29,11 +29,12 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => {
   console.log('MongoDB connected');
-  // This will only run the server locally
+  // Start server only when running locally
   if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   }
 })
 .catch((err) => console.error('MongoDB connection error:', err));
 
+// Export the app for Vercel
 module.exports = app;
