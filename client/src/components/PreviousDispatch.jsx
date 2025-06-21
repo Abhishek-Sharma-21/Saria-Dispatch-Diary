@@ -46,7 +46,6 @@ export default function PreviousDispatch() {
     doc.setFontSize(16);
     const title = "Darshan Kumar Sharma";
     doc.text(title, 10, 12);
-    // Underline: measure text width and draw a line under the text
     const textWidth = doc.getTextWidth(title);
     doc.setLineWidth(0.5);
     doc.line(10, 14, 10 + textWidth, 14);
@@ -56,15 +55,50 @@ export default function PreviousDispatch() {
     doc.setFontSize(12);
     doc.text(`Created At: ${createdAt}`, 10, 32);
 
-    let y = 42;
+    // Table layout
+    const startX = 10;
+    const startY = 44;
+    const colWidths = [18, 55, 55, 35]; // S.No, Supplier, Vehicle, Weight
+    const colX = [startX, startX + colWidths[0], startX + colWidths[0] + colWidths[1], startX + colWidths[0] + colWidths[1] + colWidths[2], startX + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3]];
+    let y = startY;
+
+    // Draw header
+    doc.setFont('helvetica', 'bold');
+    doc.text('S.No', colX[0] + 2, y + 6);
+    doc.text('Supplier', colX[1] + 2, y + 6);
+    doc.text('Vehicle', colX[2] + 2, y + 6);
+    doc.text('Weight (MT)', colX[3] + 2, y + 6);
+    doc.setFont('helvetica', 'normal');
+
+    // Draw header border
+    doc.setLineWidth(0.3);
+    doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), 10);
+    y += 10;
+
+    let totalWeight = 0;
     group.forEach((entry, i) => {
-      doc.text(`${i + 1}. Supplier: ${entry.supplier}`, 10, y);
-      y += 7;
-      doc.text(`   Vehicle: ${entry.vehicle}`, 10, y);
-      y += 7;
-      doc.text(`   Weight: ${entry.weight} MT`, 10, y);
+      doc.text(String(i + 1), colX[0] + 2, y + 6);
+      doc.text(entry.supplier, colX[1] + 2, y + 6);
+      doc.text(entry.vehicle, colX[2] + 2, y + 6);
+      doc.text(String(entry.weight), colX[3] + 2, y + 6, { align: 'left' });
+      // Draw row border
+      doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), 10);
+      totalWeight += parseFloat(entry.weight) || 0;
       y += 10;
     });
+
+    // Total row
+    doc.setFont('helvetica', 'bold');
+    doc.text('Total', colX[1] + 2, y + 6);
+    doc.text(totalWeight.toFixed(3) + ' MT', colX[3] + 2, y + 6, { align: 'left' });
+    doc.setFont('helvetica', 'normal');
+    // Draw total row border
+    doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), 10);
+
+    // Draw vertical lines for columns
+    for (let i = 1; i < colX.length - 1; i++) {
+      doc.line(colX[i], startY, colX[i], y + 10);
+    }
 
     doc.save(`dispatch_group_${createdAt.replace(/\W+/g, "_")}.pdf`);
   };
@@ -85,15 +119,50 @@ export default function PreviousDispatch() {
     doc.setFontSize(12);
     doc.text(`Created At: ${createdAt}`, 10, 32);
 
-    let y = 42;
+    // Table layout
+    const startX = 10;
+    const startY = 44;
+    const colWidths = [18, 55, 55, 35];
+    const colX = [startX, startX + colWidths[0], startX + colWidths[0] + colWidths[1], startX + colWidths[0] + colWidths[1] + colWidths[2], startX + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3]];
+    let y = startY;
+
+    // Draw header
+    doc.setFont('helvetica', 'bold');
+    doc.text('S.No', colX[0] + 2, y + 6);
+    doc.text('Supplier', colX[1] + 2, y + 6);
+    doc.text('Vehicle', colX[2] + 2, y + 6);
+    doc.text('Weight (MT)', colX[3] + 2, y + 6);
+    doc.setFont('helvetica', 'normal');
+
+    // Draw header border
+    doc.setLineWidth(0.3);
+    doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), 10);
+    y += 10;
+
+    let totalWeight = 0;
     group.forEach((entry, i) => {
-      doc.text(`${i + 1}. Supplier: ${entry.supplier}`, 10, y);
-      y += 7;
-      doc.text(`   Vehicle: ${entry.vehicle}`, 10, y);
-      y += 7;
-      doc.text(`   Weight: ${entry.weight} MT`, 10, y);
+      doc.text(String(i + 1), colX[0] + 2, y + 6);
+      doc.text(entry.supplier, colX[1] + 2, y + 6);
+      doc.text(entry.vehicle, colX[2] + 2, y + 6);
+      doc.text(String(entry.weight), colX[3] + 2, y + 6, { align: 'left' });
+      // Draw row border
+      doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), 10);
+      totalWeight += parseFloat(entry.weight) || 0;
       y += 10;
     });
+
+    // Total row
+    doc.setFont('helvetica', 'bold');
+    doc.text('Total', colX[1] + 2, y + 6);
+    doc.text(totalWeight.toFixed(3) + ' MT', colX[3] + 2, y + 6, { align: 'left' });
+    doc.setFont('helvetica', 'normal');
+    // Draw total row border
+    doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), 10);
+
+    // Draw vertical lines for columns
+    for (let i = 1; i < colX.length - 1; i++) {
+      doc.line(colX[i], startY, colX[i], y + 10);
+    }
 
     // Get PDF as Blob
     const pdfBlob = doc.output('blob');
