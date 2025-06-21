@@ -69,6 +69,51 @@ export default function PreviousDispatch() {
     doc.save(`dispatch_group_${createdAt.replace(/\W+/g, "_")}.pdf`);
   };
 
+  // PDF share using jsPDF and Web Share API
+  const handleShare = async (group, createdAt) => {
+    const doc = new jsPDF();
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    const title = "Darshan Kumar Sharma";
+    doc.text(title, 10, 12);
+    const textWidth = doc.getTextWidth(title);
+    doc.setLineWidth(0.5);
+    doc.line(10, 14, 10 + textWidth, 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text(`Dispatch Report`, 10, 22);
+    doc.setFontSize(12);
+    doc.text(`Created At: ${createdAt}`, 10, 32);
+
+    let y = 42;
+    group.forEach((entry, i) => {
+      doc.text(`${i + 1}. Supplier: ${entry.supplier}`, 10, y);
+      y += 7;
+      doc.text(`   Vehicle: ${entry.vehicle}`, 10, y);
+      y += 7;
+      doc.text(`   Weight: ${entry.weight} MT`, 10, y);
+      y += 10;
+    });
+
+    // Get PDF as Blob
+    const pdfBlob = doc.output('blob');
+    const file = new File([pdfBlob], `dispatch_group_${createdAt.replace(/\W+/g, "_")}.pdf`, { type: "application/pdf" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Dispatch Report",
+          text: "Sharing dispatch report PDF via WhatsApp or any app.",
+        });
+      } catch (err) {
+        alert("Share cancelled or failed.");
+      }
+    } else {
+      alert("Sharing files is not supported on this device/browser. Please use the Download button instead.");
+    }
+  };
+
   // Delete all dispatches in a group
   const handleDeleteGroup = async (group, createdAt) => {
     try {
@@ -114,6 +159,15 @@ export default function PreviousDispatch() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4m-8 8h8" />
                 </svg>
                 Download PDF
+              </button>
+              <button
+                onClick={() => handleShare(group, createdAt)}
+                className="flex items-center gap-2 px-4 py-2 rounded-md bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12h7m0 0l-3-3m3 3l-3 3M9 12a6 6 0 016-6h1m-7 6a6 6 0 016 6h1" />
+                </svg>
+                Share PDF
               </button>
               <button
                 onClick={() => handleEditGroup(group, createdAt)}
