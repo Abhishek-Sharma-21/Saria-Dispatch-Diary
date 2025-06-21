@@ -8,11 +8,20 @@ const dispatchRoutes = require('./routes/dispatchRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'https://saria-dispatch-diary.vercel.app', // Production frontend
+    'http://localhost:5173', // Local development (Vite default)
+    'http://localhost:3000', // Alternative local port
+    'http://localhost:4000'  // Your current local backend port
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
