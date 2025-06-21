@@ -6,7 +6,7 @@ require('dotenv').config();
 const dispatchRoutes = require('./routes/dispatchRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 // CORS configuration
 const corsOptions = {
